@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Transport HMI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind.css') }}">
+    <script defer src="/static/main.js"></script>
+</head>
+
+<body class="bg-gray-100 text-gray-900 h-dvh overflow-hidden pb-8">
+    <div class="h-full flex flex-col p-2 m-4 gap-4 max-w-full">
+        <!-- Pagina header  -->
+        <div class="bg-white shadow-xl h-20 rounded-2xl p-4 text-center flex-shrink-0">
+            <h1 class="text-3xl font-extrabold tracking-tight text-gray-800">
+                Poopscoop Logistics
+            </h1>
+        </div>
+
+        <div class="grid grid-cols-4 gap-4 h-full">
+            <!-- Paneel knoppen -->
+            <div class="bg-white shadow-xl rounded-2xl max-h-full col-span-3 p-4 flex-1 flex flex-col">
+                <div class="flex flex-col h-full place-content-center">
+                    <div class="text-center max-h-min">
+                        <h2 class="text-2xl font-semibold text-gray-800">Choose control mode</h2>
+                    </div>
+                    <div class="flex flex-row gap-16 m-8 h-32">
+                        <a href="/automatic" 
+                            class="flex-1 rounded-full text-2xl border-1 border-gray-200 font-semibold bg-white text-black hover:bg-gray-200 shadow-md hover:shadow-lg transition-all flex items-center justify-center">
+                            Automatic
+                        </a>
+                        <a href="/manual"
+                            class="flex-1 rounded-full text-2xl border-1 border-gray-200 font-semibold bg-white text-black hover:bg-gray-200 shadow-md hover:shadow-lg transition-all flex items-center justify-center">
+                            Manual
+                        </a>
+                    </div>
+                </div>
+
+                <div class="flex flex-col h-full place-content-center">
+                    <div class="text-center max-h-min">
+                        <h2 class="text-2xl font-semibold text-gray-800">Initialise carriage</h2>
+                    </div>
+                    <div class="flex flex-row gap-16 m-8 h-32">
+                        <button
+                            class="flex-1 rounded-full text-2xl border-1 border-gray-200 font-semibold bg-white text-black hover:bg-gray-200 shadow-md hover:shadow-lg transition-all flex items-center justify-center">
+                            Initialise state
+                        </button>
+                        <button
+                            class="flex-1 rounded-full text-2xl border-1 border-gray-200 font-semibold bg-white text-black hover:bg-gray-200 shadow-md hover:shadow-lg transition-all flex items-center justify-center">
+                            Reset
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="grid grid-rows-2 gap-4 h-full col-span-1">
+                <!-- Paneel leeg  -->
+                <div class="bg-white shadow-xl rounded-2xl p-4 flex-shrink-0">
+                    <h2 class="text-lg font-semibold text-gray-800">Hier komt een tekst of een status ofzo</h2>
+                    <p class="text-sm font-semibold text-gray-800">Misschien uitleg over de carriage</p>
+                </div>
+
+                <!-- Paneel meldingen  -->
+                <div class="bg-white shadow-xl rounded-2xl p-4 flex-shrink-0">
+                    <!-- Status / berichten vak -->
+                    <div class="flex items-center justify-between mb-2">
+                        <h2 class="text-lg font-semibold text-gray-800">Error messages</h2>
+                    </div>
+
+                    <!-- Het textvak zelf -->
+                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-3 h-max-22 overflow-y-auto font-mono text-sm text-gray-700" id="message-box">
+                        <!-- Voor nu een voorbeeldtekst; later vul je dit vanuit Python/JS -->
+                        Systeem gereed. Wacht op commando...
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>

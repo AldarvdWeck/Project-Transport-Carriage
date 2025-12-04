@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Transport HMI - Manual Mode</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind.css') }}">
+    <script defer src="{{ url_for('static', filename='js/main.js') }}"></script>
+</head>
+
+<body class="bg-gray-100 text-gray-900 h-dvh overflow-hidden pb-8">
+    <div class="h-full flex flex-col p-2 m-4 gap-4 max-w-full">
+        <!-- Pagina header  -->
+        <div class="bg-white h-20 shadow-xl rounded-2xl p-4 flex-shrink-0">
+            <div class="grid grid-cols-3">
+                <!-- Home knop  -->
+                <a href="/"
+                    class="flex-1 w-12 h-12 rounded-full text-2xl border-1 border-gray-200 font-semibold bg-white text-black hover:bg-gray-200 shadow-md hover:shadow-lg transition-all flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        class="bi bi-house-door-fill" viewBox="0 0 16 16">
+                        <path
+                            d="M6.5 14.5v-3.505c0-.245.25-.495.5-.495h2c.25 0 .5.25.5.5v3.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5" />
+                    </svg>
+                </a>
+                <!-- Pagina naam  -->
+                <h1 class="text-3xl font-extrabold text-center tracking-tight text-gray-800">
+                    Manual control
+                </h1>
+                <!-- Spacing  -->
+                <div class="w-12">
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-4 gap-4 h-full">
+            <!-- X-as control -->
+            <div class="bg-white shadow-xl rounded-2xl max-h-full col-span-1 p-4 flex flex-col">
+                <h2 class="text-lg font-semibold text-gray-800 text-center">X-axis control</h2>
+
+                <div class="grid grid-cols-2 w-full place-content-around my-2 py-2 border-y-1 border-gray-200 h-16">
+                    <h2 class="text-lg h-full font-normal text-gray-800 flex items-center justify-end text-right pr-6">
+                        Encoder value:</h2>
+                    <div
+                        class="bg-white shadow-xl rounded-2xl p-1 border-1 border-gray-200 flex items-center justify-center max-w-24">
+                        <p class="text-lg text-gray-800 text-center">#</p>
+                        <p class="text-lg text-gray-800 ml-1 text-center">°</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center w-full pb-2 border-b-1 border-gray-200 gap-2 h-16">
+                    <button
+                        class="w-12 h-12 rounded-full text-2xl border-1 border-gray-200 font-semibold bg-white text-black hover:bg-gray-200 shadow-md hover:shadow-lg transition-all flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-dash-square-fill" viewBox="0 0 16 16">
+                            <path
+                                d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm2.5 7.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1" />
+                        </svg>
+                    </button>
+
+                    <div class="flex-1 grid grid-cols-2 gap-2">
+                        <h2 class="text-lg font-normal text-gray-800 flex items-center justify-end text-right pr-4">
+                            Speed:</h2>
+                        <div
+                            class="bg-white shadow-xl rounded-2xl p-1 border-1 border-gray-200 flex items-center justify-center max-w-24">
+                            <p class="text-lg text-gray-800 text-center">#</p>
+                            <p class="text-lg text-gray-800 ml-1 text-center">m/s</p>
+                        </div>
+                    </div>
+
+                    <button
+                        class="w-12 h-12 rounded-full text-2xl border-1 border-gray-200 font-semibold bg-white text-black hover:bg-gray-200 shadow-md hover:shadow-lg transition-all flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-plus-square-fill" viewBox="0 0 16 16">
+                            <path
+                                d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm6.5 4.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3a.5.5 0 0 1 1 0" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="flex-1 flex flex-col items-center justify-center gap-8">
+                    <button
+                        class="w-20 h-20 rounded-full text-2xl border-1 border-gray-200 font-semibold bg-white text-black hover:bg-gray-200 shadow-md hover:shadow-lg transition-all flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                            class="bi bi-caret-up-fill" viewBox="0 0 16 16">
+                            <path
+                                d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z" />
+                        </svg>
+                    </button>
+                    <button
+                        class="w-20 h-20 rounded-full text-2xl border-1 border-gray-200 font-semibold bg-white text-black hover:bg-gray-200 shadow-md hover:shadow-lg transition-all flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                            class="bi bi-house-check-fill" viewBox="0 0 16 16">
+                            <path
+                                d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L8 2.207l6.646 6.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293z" />
+                            <path d="m8 3.293 4.712 4.712A4.5 4.5 0 0 0 8.758 15H3.5A1.5 1.5 0 0 1 2 13.5V9.293z" />
+                            <path
+                                d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m1.679-4.493-1.335 2.226a.75.75 0 0 1-1.174.144l-.774-.773a.5.5 0 0 1 .708-.707l.547.547 1.17-1.951a.5.5 0 1 1 .858.514" />
+                        </svg>
+                    </button>
+                    <button
+                        class="w-20 h-20 rounded-full text-2xl border-1 border-gray-200 font-semibold bg-white text-black hover:bg-gray-200 shadow-md hover:shadow-lg transition-all flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                            class="bi bi-caret-down-fill" viewBox="0 0 16 16">
+                            <path
+                                d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <!-- Y-as control -->
+            <div class="bg-white shadow-xl rounded-2xl max-h-full col-span-1 p-4 flex flex-col">
+                <h2 class="text-lg font-semibold text-gray-800 text-center">Y-axis control</h2>
+
+                <div class="grid grid-cols-2 w-full place-content-around my-2 py-2 border-y-1 border-gray-200 h-16">
+                    <h2 class="text-lg h-full font-normal text-gray-800 flex items-center justify-end text-right pr-6">
+                        Encoder value:</h2>
+                    <div
+                        class="bg-white shadow-xl rounded-2xl p-1 border-1 border-gray-200 flex items-center justify-center max-w-24">
+                        <p class="text-lg text-gray-800 text-center">#</p>
+                        <p class="text-lg text-gray-800 ml-1 text-center">°</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center w-full pb-2 border-b-1 border-gray-200 gap-2 h-16">
+                    <button
+                        class="w-12 h-12 rounded-full text-2xl border-1 border-gray-200 font-semibold bg-white text-black hover:bg-gray-200 shadow-md hover:shadow-lg transition-all flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-dash-square-fill" viewBox="0 0 16 16">
+                            <path
+                                d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm2.5 7.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1" />
+                        </svg>
+                    </button>
+
+                    <div class="flex-1 grid grid-cols-2 gap-2">
+                        <h2 class="text-lg font-normal text-gray-800 flex items-center justify-end text-right pr-4">
+                            Speed:</h2>
+                        <div
+                            class="bg-white shadow-xl rounded-2xl p-1 border-1 border-gray-200 flex items-center justify-center max-w-24">
+                            <p class="text-lg text-gray-800 text-center">#</p>
+                            <p class="text-lg text-gray-800 ml-1 text-center">m/s</p>
+                        </div>
+                    </div>
+
+                    <button
+                        class="w-12 h-12 rounded-full text-2xl border-1 border-gray-200 font-semibold bg-white text-black hover:bg-gray-200 shadow-md hover:shadow-lg transition-all flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-plus-square-fill" viewBox="0 0 16 16">
+                            <path
+                                d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm6.5 4.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3a.5.5 0 0 1 1 0" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="flex-1 flex flex-col items-center justify-center gap-8">
+                    <button
+                        class="w-20 h-20 rounded-full text-2xl border-1 border-gray-200 font-semibold bg-white text-black hover:bg-gray-200 shadow-md hover:shadow-lg transition-all flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                            class="bi bi-caret-up-fill" viewBox="0 0 16 16">
+                            <path
+                                d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z" />
+                        </svg>
+                    </button>
+                    <button
+                        class="w-20 h-20 rounded-full text-2xl border-1 border-gray-200 font-semibold bg-white text-black hover:bg-gray-200 shadow-md hover:shadow-lg transition-all flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                            class="bi bi-house-check-fill" viewBox="0 0 16 16">
+                            <path
+                                d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L8 2.207l6.646 6.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293z" />
+                            <path d="m8 3.293 4.712 4.712A4.5 4.5 0 0 0 8.758 15H3.5A1.5 1.5 0 0 1 2 13.5V9.293z" />
+                            <path
+                                d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m1.679-4.493-1.335 2.226a.75.75 0 0 1-1.174.144l-.774-.773a.5.5 0 0 1 .708-.707l.547.547 1.17-1.951a.5.5 0 1 1 .858.514" />
+                        </svg>
+                    </button>
+                    <button
+                        class="w-20 h-20 rounded-full text-2xl border-1 border-gray-200 font-semibold bg-white text-black hover:bg-gray-200 shadow-md hover:shadow-lg transition-all flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                            class="bi bi-caret-down-fill" viewBox="0 0 16 16">
+                            <path
+                                d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <!-- Dock/Undock control -->
+            <div class="bg-white shadow-xl rounded-2xl max-h-full col-span-1 p-4 flex flex-col">
+                <h2 class="text-lg font-semibold text-gray-800 text-center">Dock/Undock control</h2>
+
+                <div class="flex items-center w-full my-2 py-2 border-y-1 border-gray-200 gap-2 h-16">
+                    <button
+                        class="w-12 h-12 rounded-full text-2xl border-1 border-gray-200 font-semibold bg-white text-black hover:bg-gray-200 shadow-md hover:shadow-lg transition-all flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-dash-square-fill" viewBox="0 0 16 16">
+                            <path
+                                d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm2.5 7.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1" />
+                        </svg>
+                    </button>
+
+                    <div class="flex-1 grid grid-cols-2 gap-2">
+                        <h2 class="text-lg font-normal text-gray-800 flex items-center justify-end text-right pr-4">
+                            Speed:</h2>
+                        <div
+                            class="bg-white shadow-xl rounded-2xl p-1 border-1 border-gray-200 flex items-center justify-center max-w-24">
+                            <p class="text-lg text-gray-800 text-center">#</p>
+                            <p class="text-lg text-gray-800 ml-1 text-center">m/s</p>
+                        </div>
+                    </div>
+
+                    <button
+                        class="w-12 h-12 rounded-full text-2xl border-1 border-gray-200 font-semibold bg-white text-black hover:bg-gray-200 shadow-md hover:shadow-lg transition-all flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-plus-square-fill" viewBox="0 0 16 16">
+                            <path
+                                d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm6.5 4.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3a.5.5 0 0 1 1 0" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-2 w-full place-content-around h-14">
+                    <!-- Spacer-->
+                </div>
+
+                <div class="flex-1 flex flex-col items-center justify-center gap-8">
+                    <button
+                        class="w-20 h-20 rounded-full text-2xl border-1 border-gray-200 font-semibold bg-white text-black hover:bg-gray-200 shadow-md hover:shadow-lg transition-all flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                            class="bi bi-caret-right-fill" viewBox="0 0 16 16">
+                            <path
+                                d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z" />
+                        </svg>
+                    </button>
+                    <button
+                        class="w-20 h-20 rounded-full text-2xl border-1 border-gray-200 font-semibold bg-white text-black hover:bg-gray-200 shadow-md hover:shadow-lg transition-all flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                            class="bi bi-house-check-fill" viewBox="0 0 16 16">
+                            <path
+                                d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L8 2.207l6.646 6.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293z" />
+                            <path d="m8 3.293 4.712 4.712A4.5 4.5 0 0 0 8.758 15H3.5A1.5 1.5 0 0 1 2 13.5V9.293z" />
+                            <path
+                                d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m1.679-4.493-1.335 2.226a.75.75 0 0 1-1.174.144l-.774-.773a.5.5 0 0 1 .708-.707l.547.547 1.17-1.951a.5.5 0 1 1 .858.514" />
+                        </svg>
+                    </button>
+                    <button
+                        class="w-20 h-20 rounded-full text-2xl border-1 border-gray-200 font-semibold bg-white text-black hover:bg-gray-200 shadow-md hover:shadow-lg transition-all flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                            class="bi bi-caret-left-fill" viewBox="0 0 16 16">
+                            <path
+                                d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-rows-2 gap-4 h-full col-span-1">
+                <!-- Paneel leeg  -->
+                <div class="bg-white shadow-xl rounded-2xl p-4 flex-shrink-0">
+                    <h2 class="text-lg text-center font-semibold text-gray-800">Sensors</h2>
+                    <div class="grid grid-rows-4 grid-cols-2 mt-4 gap-y-8">
+                        <div class="flex flex-row items-center justify-center gap-2">
+                            <div class="bg-gray-300 w-6 h-6 rounded-full flex-shrink-0"></div>
+                            <p class="text-sm font-normal text-gray-800">Sensor 1</p>
+                        </div>
+                        <div class="flex flex-row items-center justify-center gap-2">
+                            <div class="bg-gray-300 w-6 h-6 rounded-full flex-shrink-0"></div>
+                            <p class="text-sm font-normal text-gray-800">Sensor 2</p>
+                        </div>
+                        <div class="flex flex-row items-center justify-center gap-2">
+                            <div class="bg-gray-300 w-6 h-6 rounded-full flex-shrink-0"></div>
+                            <p class="text-sm font-normal text-gray-800">Sensor 3</p>
+                        </div>
+                        <div class="flex flex-row items-center justify-center gap-2">
+                            <div class="bg-gray-300 w-6 h-6 rounded-full flex-shrink-0"></div>
+                            <p class="text-sm font-normal text-gray-800">Sensor 4</p>
+                        </div>
+                        <div class="flex flex-row items-center justify-center gap-2">
+                            <div class="bg-gray-300 w-6 h-6 rounded-full flex-shrink-0"></div>
+                            <p class="text-sm font-normal text-gray-800">Sensor 5</p>
+                        </div>
+                        <div class="flex flex-row items-center justify-center gap-2">
+                            <div class="bg-gray-300 w-6 h-6 rounded-full flex-shrink-0"></div>
+                            <p class="text-sm font-normal text-gray-800">Sensor 6</p>
+                        </div>
+                        <div class="flex flex-row items-center justify-center gap-2">
+                            <div class="bg-gray-300 w-6 h-6 rounded-full flex-shrink-0"></div>
+                            <p class="text-sm font-normal text-gray-800">Sensor 7</p>
+                        </div>
+                        <div class="flex flex-row items-center justify-center gap-2">
+                            <div class="bg-gray-300 w-6 h-6 rounded-full flex-shrink-0"></div>
+                            <p class="text-sm font-normal text-gray-800">Sensor 8</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Paneel meldingen  -->
+                <div class="bg-white shadow-xl rounded-2xl p-4 flex-shrink-0">
+                    <!-- Status / berichten vak -->
+                    <div class="flex items-center justify-between mb-2">
+                        <h2 class="text-lg font-semibold text-gray-800">Error messages</h2>
+                    </div>
+
+                    <!-- Het textvak zelf -->
+                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-3 h-max-22 overflow-y-auto font-mono text-sm text-gray-700"
+                        id="message-box">
+                        <!-- Voor nu een voorbeeldtekst later vul je dit vanuit Python/JS -->
+                        Systeem gereed. Wacht op commando...
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

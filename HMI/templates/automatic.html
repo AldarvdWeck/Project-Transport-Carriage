@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Transport HMI - Automatic Mode</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind.css') }}">
+    <script defer src="{{ url_for('static', filename='js/main.js') }}"></script>
+</head>
+
+<body class="bg-gray-100 text-gray-900 h-dvh overflow-hidden pb-8">
+    <div class="h-full flex flex-col p-2 m-4 gap-4 max-w-full">
+        <!-- Pagina header  -->
+        <div class="bg-white h-20 shadow-xl rounded-2xl p-4 flex-shrink-0">
+            <div class="grid grid-cols-3">
+                <!-- Home knop  -->
+                <a href="/"
+                    class="flex-1 w-12 h-12 rounded-full text-2xl border-1 border-gray-200 font-semibold bg-white text-black hover:bg-gray-200 shadow-md hover:shadow-lg transition-all flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        class="bi bi-house-door-fill" viewBox="0 0 16 16">
+                        <path
+                            d="M6.5 14.5v-3.505c0-.245.25-.495.5-.495h2c.25 0 .5.25.5.5v3.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5" />
+                    </svg>
+                </a>
+                <!-- Pagina naam  -->
+                <h1 class="text-3xl font-extrabold text-center tracking-tight text-gray-800">
+                    Automatic control
+                </h1>
+                <!-- Spacing  -->
+                <div class="w-12">
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-4 gap-4 h-full">
+            <!-- Paneel knoppen -->
+            <div class="bg-white shadow-xl rounded-2xl max-h-full col-span-3 p-4 flex-1 flex flex-col">
+                <div class="grid grid-rows-2 h-full gap-4">
+                    <div class="mb-20 flex flex-col items-center justify-center">
+                        <!-- Dropdown Button -->
+                        <button id="graph-dropdown-btn" class="p-4 text-gray-700 bg-white rounded-full border-1 border-gray-200 shadow-lg flex items-center justify-center cursor-pointer h-16 hover:bg-gray-200 transition-colors duration-300">
+                            Select CSV file
+                            <span class="ml-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
+                                    <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+                                </svg>
+                            </span>
+                        </button>
+
+                        <!-- Dropdown Menu -->
+                        <div class="h-0 w-0 relative">
+                            <div id="graph-dropdown-menu" class="absolute hidden -translate-x-1/2 w-max h-fit scale-0 opacity-0 origin-top mt-2 p-2 text-gray-700 bg-white rounded-2xl border-1 border-gray-200 shadow-2xl flex-col transform transition-all duration-300 z-50">
+                                <div class="p-2 flex items-center justify-center hover:bg-gray-200 hover:rounded-md cursor-pointer" data-menu="graph-menu" onclick="selectOption(this)">
+                                    CSV 1
+                                </div>
+                                <div class="p-2 flex items-center justify-center border-y-1 border-gray-200 hover:bg-gray-200 hover:rounded-md cursor-pointer" data-menu="graph-menu" onclick="selectOption(this)">
+                                    CSV 2
+                                </div>
+                                <div class="p-2 flex items-center justify-center hover:bg-gray-200 hover:rounded-md cursor-pointer" data-menu="graph-menu" onclick="selectOption(this)">
+                                    CSV 3
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Start en stop knop -->
+                    <div class="grid grid-cols-2 h-32 m-8 gap-16">
+                        <button
+                            class="flex-1 rounded-full text-2xl font-semibold bg-green-200 text-black hover:bg-lime-400 shadow-md hover:shadow-lg transition-all">
+                            Start
+                        </button>
+                        <button
+                            class="flex-1 rounded-full text-2xl font-semibold bg-red-200 text-black hover:bg-red-400 shadow-md hover:shadow-lg transition-all">
+                            Stop
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-rows-2 gap-4 h-full col-span-1">
+                <!-- Paneel leeg  -->
+                <div class="bg-white shadow-xl rounded-2xl p-4 flex-shrink-0">
+                    <h2 class="text-lg font-semibold text-gray-800">Hier komt iets van status ofzo</h2>
+                </div>
+
+                <!-- Paneel meldingen  -->
+                <div class="bg-white shadow-xl rounded-2xl p-4 flex-shrink-0">
+                    <!-- Status / berichten vak -->
+                    <div class="flex items-center justify-between mb-2">
+                        <h2 class="text-lg font-semibold text-gray-800">Error messages</h2>
+                    </div>
+
+                    <!-- Het textvak zelf -->
+                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-3 h-max-22 overflow-y-auto font-mono text-sm text-gray-700"
+                        id="message-box">
+                        <!-- Voor nu een voorbeeldtekst later vul je dit vanuit Python/JS -->
+                        Systeem gereed. Wacht op commando...
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
