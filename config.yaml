@@ -1,0 +1,30 @@
+# instellingen (pins, snelheden, home-posities)
+
+gpio:
+  status_led:
+    type: led
+    pin: 17
+
+  error_led:
+    type: led
+    pin: 5
+
+  relay_main:
+    type: output
+    pin: 22
+    active_high: true
+
+  fan:
+    type: pwm
+    pin: 12
+    frequency: 25000
+
+  start_button:
+    type: button
+    pin: 18
+    pull_up: true
+
+  stop_button:
+    type: button
+    pin: 6
+    pull_up: true
