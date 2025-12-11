@@ -34,5 +34,3 @@ def automatic_led():
 def sensor_1_status():
     active = gpio.is_active("sensor_1")
     return jsonify(active=active)
-
-#fkjehkfe
