@@ -449,6 +449,9 @@
   .bg-green-200 {
     background-color: var(--color-green-200);
   }
+  .bg-green-400 {
+    background-color: var(--color-green-400);
+  }
   .bg-red-200 {
     background-color: var(--color-red-200);
   }

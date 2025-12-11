@@ -71,6 +71,9 @@ class GPIOManager:
     def is_pressed(self, name):
         return self.devices[name].is_pressed
 
+    def is_active(self, name):
+        return bool(self.devices[name].is_active)
+
     # ---------- SHUTDOWN ----------
     def shutdown(self):
         for dev in self.devices.values():

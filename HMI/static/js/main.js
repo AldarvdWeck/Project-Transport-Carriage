@@ -7,7 +7,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialiseer dropdown functionaliteit
     initializeDropdowns();
+
+    // Initialiseer automatische modus knoppen (start/stop)
+    initializeAutomaticControls();
+
+    // initialiseer inductie sensor
+    initializeSensorIndicators(); 
 });
+
 
 // Dropdown functionaliteit
 function initializeDropdowns() {
@@ -131,4 +138,103 @@ function clearDropdownOptions(dropdownMenuId) {
     if (!dropdownMenu) return;
     
     dropdownMenu.innerHTML = '';
+}
+
+function initializeAutomaticControls() {
+    // Zoek de knoppen alleen op pagina's waar ze bestaan
+    const startBtn = document.getElementById('btn-start');
+    const stopBtn  = document.getElementById('btn-stop');
+    const messageBox = document.getElementById('message-box');
+
+    // Als deze pagina geen start/stop knoppen heeft, niks doen
+    if (!startBtn || !stopBtn) {
+        return;
+    }
+
+    console.log('Automatic controls gevonden, event listeners worden gekoppeld');
+
+    // Klik-handler voor Start
+    startBtn.addEventListener('click', function() {
+        sendAutomaticCommand('start', messageBox);
+    });
+
+    // Klik-handler voor Stop
+    stopBtn.addEventListener('click', function() {
+        sendAutomaticCommand('stop', messageBox);
+    });
+}
+
+// Stuurt een commando naar de backend om de LED/GPIO aan te sturen
+async function sendAutomaticCommand(action, messageBox) {
+    try {
+        const response = await fetch('/api/automatic/led', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ action: action })  // { "action": "start" } of "stop"
+        });
+
+        const data = await response.json();
+        console.log('Server response:', data);
+
+        if (messageBox) {
+            if (data.success) {
+                messageBox.textContent = action === 'start'
+                    ? 'Transport line started (LED aan).'
+                    : 'Transport line stopped (LED uit).';
+            } else {
+                messageBox.textContent = 'Error: ' + (data.error || 'Onbekende fout');
+            }
+        }
+    } catch (err) {
+        console.error('Fout bij versturen commando:', err);
+        if (messageBox) {
+            messageBox.textContent = 'Kon geen verbinding maken met de server.';
+        }
+    }
+}
+
+// =====================
+// Sensor status indicators (manual page)
+// =====================
+
+function initializeSensorIndicators() {
+    const sensorDot = document.getElementById('sensor-1-dot');
+
+    // Als deze pagina geen sensor-bolletje heeft, doe niks
+    if (!sensorDot) {
+        return;
+    }
+
+    console.log('Sensor indicator gevonden, start polling...');
+
+    // Elke 250 ms status opvragen
+    setInterval(() => {
+        updateSensorIndicator(sensorDot);
+    }, 250);
+}
+
+async function updateSensorIndicator(sensorDot) {
+    try {
+        const response = await fetch('/api/sensors/1');
+        if (!response.ok) {
+            throw new Error('HTTP ' + response.status);
+        }
+
+        const data = await response.json();
+        const active = !!data.active; // true/false
+
+        // Tailwind classes togglen
+        if (active) {
+            sensorDot.classList.remove('bg-gray-300');
+            sensorDot.classList.add('bg-green-400');
+        } else {
+            sensorDot.classList.remove('bg-green-400');
+            sensorDot.classList.add('bg-gray-300');
+        }
+    } catch (err) {
+        console.error('Fout bij lezen sensor status:', err);
+        // hier zou je eventueel het bolletje op een error-kleur kunnen zetten
+    }
 }
