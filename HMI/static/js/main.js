@@ -1,6 +1,9 @@
 // Main JavaScript file voor alle pagina's
 // Transport HMI functionaliteit
 
+// Snelheid in stappen 0..10 (0 = 0.0, 10 = 1.0)
+let currentSpeedLevel = 6;  // default 6 → 0.6 PWM
+
 // Wacht tot de DOM geladen is
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Main.js geladen');
@@ -13,6 +16,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // initialiseer inductie sensor
     initializeSensorIndicators(); 
+
+    // Initialiseer x-as motor
+    initializeManualControls();
+
+    // Initialiseer de speed control van de x-as
+    initializeSpeedControl();
+
+    // Initialiseer encoder
+    initializeEncoderValue()
 });
 
 
@@ -238,3 +250,171 @@ async function updateSensorIndicator(sensorDot) {
         // hier zou je eventueel het bolletje op een error-kleur kunnen zetten
     }
 }
+
+// =====================
+// X-as motor (manual page)
+// =====================
+
+function initializeManualControls() {
+    const forwardBtn  = document.getElementById('btn-forward');
+    const backwardBtn = document.getElementById('btn-backward');
+
+    if (!forwardBtn && !backwardBtn) {
+        return;
+    }
+
+    console.log('Manual controls gevonden – motor events gekoppeld');
+
+    // helper om huidige snelheid als 0.0–1.0 te krijgen
+    const getCurrentSpeed = () => currentSpeedLevel / 10.0;
+
+    // ===== FORWARD =====
+    const startForward = () => {
+        sendManualMotorCommand('forward', 'start', getCurrentSpeed());
+    };
+
+    const stopForward = () => {
+        sendManualMotorCommand('forward', 'stop', 0.0);
+    };
+
+    if (forwardBtn) {
+        forwardBtn.addEventListener('mousedown', startForward);
+        forwardBtn.addEventListener('mouseup', stopForward);
+        forwardBtn.addEventListener('mouseleave', stopForward);
+
+        forwardBtn.addEventListener('touchstart', e => {
+            e.preventDefault();
+            startForward();
+        });
+        forwardBtn.addEventListener('touchend', e => {
+            e.preventDefault();
+            stopForward();
+        });
+    }
+
+    // ===== BACKWARD =====
+    const startBackward = () => {
+        sendManualMotorCommand('backward', 'start', getCurrentSpeed());
+    };
+
+    const stopBackward = () => {
+        sendManualMotorCommand('backward', 'stop', 0.0);
+    };
+
+    if (backwardBtn) {
+        backwardBtn.addEventListener('mousedown', startBackward);
+        backwardBtn.addEventListener('mouseup', stopBackward);
+        backwardBtn.addEventListener('mouseleave', stopBackward);
+
+        backwardBtn.addEventListener('touchstart', e => {
+            e.preventDefault();
+            startBackward();
+        });
+        backwardBtn.addEventListener('touchend', e => {
+            e.preventDefault();
+            stopBackward();
+        });
+    }
+}
+
+async function sendManualMotorCommand(direction, action, speed) {
+    try {
+        const response = await fetch('/api/manual/motor', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                direction: direction,  // "forward" of later "backward"
+                action: action,        // "start" of "stop"
+                speed: speed           // 0.0 t/m 1.0
+            })
+        });
+
+        const data = await response.json();
+        console.log('Manual motor response:', data);
+
+        if (!data.success) {
+            console.error('Motor error:', data.error || 'Onbekende fout');
+        }
+    } catch (err) {
+        console.error('Fout bij manual motor command:', err);
+    }
+}
+
+function initializeSpeedControl() {
+    const display   = document.getElementById('speed-display');
+    const btnDown   = document.getElementById('btn-speed-down');
+    const btnUp     = document.getElementById('btn-speed-up');
+
+    // Als deze pagina geen speed control heeft, doe niets
+    if (!display || !btnDown || !btnUp) {
+        return;
+    }
+
+    console.log('Speed control gevonden – knoppen gekoppeld');
+
+    // Zorg dat display klopt bij start
+    display.textContent = currentSpeedLevel.toString();
+
+    btnDown.addEventListener('click', () => {
+        if (currentSpeedLevel > 0) {
+            currentSpeedLevel -= 1;
+            display.textContent = currentSpeedLevel.toString();
+            console.log('Nieuwe speed level:', currentSpeedLevel);
+        }
+    });
+
+    btnUp.addEventListener('click', () => {
+        if (currentSpeedLevel < 10) {
+            currentSpeedLevel += 1;
+            display.textContent = currentSpeedLevel.toString();
+            console.log('Nieuwe speed level:', currentSpeedLevel);
+        }
+    });
+}
+
+// =====================
+// Encoder x-axis (manual page)
+// =====================
+
+function initializeEncoderValue() {
+    const encoderElement = document.getElementById('encoder-value');
+
+    // Als de pagina geen encoder-veld heeft, doe niets
+    if (!encoderElement) {
+        return;
+    }
+
+    console.log('Encoder value gevonden, start polling...');
+
+    // Elke 250 ms de encoder uitlezen
+    setInterval(() => {
+        updateEncoderValue(encoderElement);
+    }, 250);
+}
+
+async function updateEncoderValue(encoderElement) {
+    try {
+        const response = await fetch('/api/encoder');
+        if (!response.ok) {
+            throw new Error('HTTP ' + response.status);
+        }
+
+        const data = await response.json();
+
+        if (!data.success) {
+            console.error('Encoder API error:', data.error || 'Onbekende fout');
+            return;
+        }
+
+        const angle = Number(data.angle) || 0;
+        // Toon bijv. 1 decimaal
+        encoderElement.textContent = angle.toFixed(1);
+    } catch (err) {
+        console.error('Fout bij lezen encoder waarde:', err);
+        // optioneel: encoderElement.textContent = '–';
+    }
+}
+
+

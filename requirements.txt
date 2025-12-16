@@ -1,3 +1,4 @@
 # Alle benodigde libraries voor het project
 numpy==1.21.0
 Flask==2.3.3
+smbus2
