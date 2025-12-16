@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeSpeedControl();
 
     // Initialiseer encoder
-    initializeEncoderValue()
+    initializeManualSensors();
 });
 
 
@@ -375,46 +375,60 @@ function initializeSpeedControl() {
 }
 
 // =====================
-// Encoder x-axis (manual page)
+// Encoder en potmeter (manual page)
 // =====================
 
-function initializeEncoderValue() {
-    const encoderElement = document.getElementById('encoder-value');
+function initializeManualSensors() {
+    const encoderEl = document.getElementById('encoder-value');
+    const potEl = document.getElementById('potmeter-value');
 
-    // Als de pagina geen encoder-veld heeft, doe niets
-    if (!encoderElement) {
-        return;
-    }
+    // Als deze pagina geen sensorvelden heeft: niks doen
+    if (!encoderEl && !potEl) return;
 
-    console.log('Encoder value gevonden, start polling...');
+    console.log('Manual sensors gevonden, start polling...');
 
-    // Elke 250 ms de encoder uitlezen
+    // Direct 1x updaten
+    updateManualSensors(encoderEl, potEl);
+
+    // Daarna elke 250ms
     setInterval(() => {
-        updateEncoderValue(encoderElement);
+        updateManualSensors(encoderEl, potEl);
     }, 250);
 }
 
-async function updateEncoderValue(encoderElement) {
-    try {
-        const response = await fetch('/api/encoder');
-        if (!response.ok) {
-            throw new Error('HTTP ' + response.status);
+async function updateManualSensors(encoderEl, potEl) {
+    // Encoder (AS5600)
+    if (encoderEl) {
+        try {
+            const response = await fetch('/api/encoder', { cache: 'no-store' });
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+
+            const data = await response.json();
+            if (!data.success) throw new Error(data.error || 'Encoder API error');
+
+            const angle = Number(data.angle);
+            encoderEl.textContent = Number.isFinite(angle) ? angle.toFixed(1) : '–';
+        } catch (err) {
+            console.error('Fout bij lezen encoder waarde:', err);
+            encoderEl.textContent = '–'; // of '#'
         }
+    }
 
-        const data = await response.json();
+    // Potmeter
+    if (potEl) {
+        try {
+            const response = await fetch('/api/potmeter', { cache: 'no-store' });
+            if (!response.ok) throw new Error('HTTP ' + response.status);
 
-        if (!data.success) {
-            console.error('Encoder API error:', data.error || 'Onbekende fout');
-            return;
+            const data = await response.json();
+            if (!data.success) throw new Error(data.error || 'Potmeter API error');
+
+            const value = Number(data.value);
+            potEl.textContent = Number.isFinite(value) ? String(Math.round(value)) : '–';
+        } catch (err) {
+            console.error('Fout bij lezen potmeter waarde:', err);
+            potEl.textContent = '–'; // of '#'
         }
-
-        const angle = Number(data.angle) || 0;
-        // Toon bijv. 1 decimaal
-        encoderElement.textContent = angle.toFixed(1);
-    } catch (err) {
-        console.error('Fout bij lezen encoder waarde:', err);
-        // optioneel: encoderElement.textContent = '–';
     }
 }
-
 
