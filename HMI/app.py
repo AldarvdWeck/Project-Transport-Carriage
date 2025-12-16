@@ -1,12 +1,14 @@
 from flask import Flask, render_template, request, jsonify
 from core.gpio_singleton import gpio
 from hardware.motor_controller import TransportMotor
-from hardware.encoder import read_encoder_angle_deg
-
+from hardware.serial_reader import ArduinoSensorReader
 
 app = Flask(__name__)
 
 motor = TransportMotor()
+
+arduino_reader = ArduinoSensorReader(baudrate=115200)
+arduino_reader.start()
 
 @app.route('/')
 def home():
@@ -79,17 +81,29 @@ def manual_motor():
         print("Error in manual_motor:", e)
         return jsonify(success=False, error=str(e)), 500
     
-    
+
 @app.route('/api/encoder', methods=['GET'])
 def encoder_value():
     """
-    Geeft de huidige encoderhoek in graden terug als JSON:
-    { "angle": 123.4 }
+    Geeft AS5600 hoek in graden terug:
+    { success: true, angle: 123.4 }
     """
-    try:
-        angle = float(read_encoder_angle_deg())
-    except Exception as e:
-        print("Fout bij uitlezen encoder:", e)
-        return jsonify(success=False, error=str(e)), 500
+    data = arduino_reader.get_latest()
 
-    return jsonify(success=True, angle=angle)
+    if not data.get("ok") or data.get("angle_deg") is None:
+        return jsonify(success=False, error=data.get("error", "No data")), 500
+
+    return jsonify(success=True, angle=float(data["angle_deg"]))
+    
+@app.route('/api/potmeter', methods=['GET'])
+def potmeter_value():
+    """
+    Geeft potmeter raw (0-1023) terug:
+    { success: true, value: 512 }
+    """
+    data = arduino_reader.get_latest()
+
+    if not data.get("ok") or data.get("pot_raw") is None:
+        return jsonify(success=False, error=data.get("error", "No data")), 500
+
+    return jsonify(success=True, value=int(data["pot_raw"]))
