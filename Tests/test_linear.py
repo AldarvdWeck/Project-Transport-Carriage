@@ -13,7 +13,7 @@ def main():
         print("Homing OK")
 
         success = controller.goto_position_mm(
-            150.0,
+            10.0,
             speed=0.5,
             timeout_s=20.0,
         )

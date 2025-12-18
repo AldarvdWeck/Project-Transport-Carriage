@@ -20,7 +20,7 @@ def is_home_sensor_xaxis_active() -> bool:
     """
 
     try:
-        value = gpio.read("sensor_1")
+        value = gpio.is_active("sensor_1")
     except Exception as e:
         raise RuntimeError(f"Homing sensor uitlezen mislukt: {e}")
 

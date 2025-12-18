@@ -8,6 +8,8 @@ ser = serial.Serial(PORT, BAUDRATE, timeout=1)
 
 print("Verbonden met Arduino")
 
+
+
 while True:
     line = ser.readline().decode("utf-8").strip()
     if not line:

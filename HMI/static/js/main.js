@@ -4,6 +4,13 @@
 // Snelheid in stappen 0..10 (0 = 0.0, 10 = 1.0)
 let currentSpeedLevel = 6;  // default 6 → 0.6 PWM
 
+// iets met knoppen uitzetten
+let UI_LOCK = {
+  locked: false,
+  activeBtn: null,
+  disabled: new Map(), // btn -> previousDisabled
+};
+
 // Wacht tot de DOM geladen is
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Main.js geladen');
@@ -23,8 +30,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialiseer de speed control van de x-as
     initializeSpeedControl();
 
-    // Initialiseer encoder
+    // Initialiseer encoder en potmeter
     initializeManualSensors();
+
+    // Initialiseer homing
+    initializeHomingButton();
 });
 
 
@@ -397,7 +407,6 @@ function initializeManualSensors() {
 }
 
 async function updateManualSensors(encoderEl, potEl) {
-    // Encoder (AS5600)
     if (encoderEl) {
         try {
             const response = await fetch('/api/encoder', { cache: 'no-store' });
@@ -406,14 +415,13 @@ async function updateManualSensors(encoderEl, potEl) {
             const data = await response.json();
             if (!data.success) throw new Error(data.error || 'Encoder API error');
 
-            const angle = Number(data.angle);
-            encoderEl.textContent = Number.isFinite(angle) ? angle.toFixed(1) : '–';
+            const mm = Number(data.position_mm);
+            encoderEl.textContent = Number.isFinite(mm) ? mm.toFixed(1) + ' mm' : '–';
         } catch (err) {
-            console.error('Fout bij lezen encoder waarde:', err);
-            encoderEl.textContent = '–'; // of '#'
+            console.error('Fout bij lezen positie:', err);
+            encoderEl.textContent = '–';
         }
     }
-
     // Potmeter
     if (potEl) {
         try {
@@ -431,4 +439,111 @@ async function updateManualSensors(encoderEl, potEl) {
         }
     }
 }
+// =====================
+// Homing knop (minimal)
+// =====================
 
+let homingRunning = false;
+let homingPollTimer = null;
+
+function setHomeBtnActive(btn, active) {
+  // active = donker
+  btn.classList.toggle('bg-gray-800', active);
+  btn.classList.toggle('text-white', active);
+  btn.classList.toggle('hover:bg-gray-900', active);
+
+  // inactive = wit
+  btn.classList.toggle('bg-white', !active);
+  btn.classList.toggle('text-black', !active);
+  btn.classList.toggle('hover:bg-gray-200', !active);
+}
+
+async function getHomingStatus() {
+  const res = await fetch('/api/homing/status', { cache: 'no-store' });
+  const data = await res.json();
+  if (!res.ok || !data.success) throw new Error(data.error || 'status failed');
+  return data; // {running: bool, last_result: ...}
+}
+
+function startHomingPolling(btn) {
+  if (homingPollTimer) clearInterval(homingPollTimer);
+
+  homingPollTimer = setInterval(async () => {
+    try {
+      const status = await getHomingStatus();
+
+      // status.running false => klaar/cancel/error
+      if (!status.running) {
+        homingRunning = false;
+        setHomeBtnActive(btn, false);
+
+        clearInterval(homingPollTimer);
+        homingPollTimer = null;
+      }
+    } catch (e) {
+      console.error('Homing status error:', e);
+      // We laten de knop in actieve state, want motor kan nog lopen.
+    }
+  }, 200);
+}
+
+async function startHoming() {
+  const res = await fetch('/api/homing/start', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({})
+  });
+  const data = await res.json();
+  if (!res.ok || !data.success) throw new Error(data.error || 'Homing start failed');
+}
+
+async function cancelHoming() {
+  const res = await fetch('/api/homing/cancel', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({})
+  });
+  const data = await res.json();
+  if (!res.ok || !data.success) throw new Error(data.error || 'Homing cancel failed');
+}
+
+function initializeHomingButton() {
+  const btn = document.getElementById('home-btn');
+  if (!btn) return;
+
+  // Bij laden: check status zodat de kleur klopt als homing al bezig was
+  getHomingStatus()
+    .then(status => {
+      homingRunning = !!status.running;
+      setHomeBtnActive(btn, homingRunning);
+      if (homingRunning) startHomingPolling(btn);
+    })
+    .catch(() => { /* geen probleem */ });
+
+  btn.addEventListener('click', async () => {
+    try {
+      if (!homingRunning) {
+        // start
+        await startHoming();
+        homingRunning = true;
+        setHomeBtnActive(btn, true);
+        startHomingPolling(btn);
+      } else {
+        // cancel
+        await cancelHoming();
+        // knop blijft nog even donker tot polling ziet dat running=false is
+      }
+    } catch (e) {
+      console.error('Homing click error:', e);
+      alert('Homing fout: ' + e.message);
+
+      // Veilig: status opnieuw ophalen zodat UI klopt
+      try {
+        const status = await getHomingStatus();
+        homingRunning = !!status.running;
+        setHomeBtnActive(btn, homingRunning);
+        if (homingRunning) startHomingPolling(btn);
+      } catch {}
+    }
+  });
+}

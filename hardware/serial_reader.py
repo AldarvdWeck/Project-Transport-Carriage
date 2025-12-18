@@ -4,6 +4,16 @@ import time
 import serial
 
 
+# --- Singleton reader (1x serial verbinding voor hele app) ---
+_reader_singleton = None
+
+def get_arduino_reader():
+    global _reader_singleton
+    if _reader_singleton is None:
+        _reader_singleton = ArduinoSensorReader(baudrate=115200)
+        _reader_singleton.start()
+    return _reader_singleton
+
 class ArduinoSensorReader:
     def __init__(self, baudrate=115200):
         self.baudrate = baudrate
