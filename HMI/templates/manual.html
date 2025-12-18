@@ -130,7 +130,9 @@
                 </div>
 
                 <div class="flex items-center w-full pb-2 border-b-1 border-gray-200 gap-2 h-16">
+                    <!-- speed - -->
                     <button
+                        id="btn-speed-down-y"
                         class="w-12 h-12 rounded-full text-2xl border-1 border-gray-200 font-semibold bg-white text-black hover:bg-gray-200 shadow-md hover:shadow-lg transition-all flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             class="bi bi-dash-square-fill" viewBox="0 0 16 16">
@@ -144,12 +146,13 @@
                             Speed:</h2>
                         <div
                             class="bg-white shadow-xl rounded-2xl p-1 border-1 border-gray-200 flex items-center justify-center max-w-24">
-                            <p class="text-lg text-gray-800 text-center">#</p>
-                            <p class="text-lg text-gray-800 ml-1 text-center">m/s</p>
+                            <p id="speed-y-display" class="text-lg text-gray-800 text-center">#</p>
                         </div>
                     </div>
 
+                    <!-- Speed + -->
                     <button
+                        id="btn-speed-up-y"
                         class="w-12 h-12 rounded-full text-2xl border-1 border-gray-200 font-semibold bg-white text-black hover:bg-gray-200 shadow-md hover:shadow-lg transition-all flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             class="bi bi-plus-square-fill" viewBox="0 0 16 16">
@@ -161,6 +164,7 @@
 
                 <div class="flex-1 flex flex-col items-center justify-center gap-8">
                     <button
+                        id="btn-y-forward"
                         class="w-20 h-20 rounded-full text-2xl border-1 border-gray-200 font-semibold bg-white text-black hover:bg-gray-200 shadow-md hover:shadow-lg transition-all flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
                             class="bi bi-caret-up-fill" viewBox="0 0 16 16">
@@ -180,6 +184,7 @@
                         </svg>
                     </button>
                     <button
+                        id="btn-y-backward"
                         class="w-20 h-20 rounded-full text-2xl border-1 border-gray-200 font-semibold bg-white text-black hover:bg-gray-200 shadow-md hover:shadow-lg transition-all flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
                             class="bi bi-caret-down-fill" viewBox="0 0 16 16">

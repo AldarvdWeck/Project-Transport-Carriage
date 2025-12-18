@@ -2,9 +2,16 @@ from flask import Flask, render_template, request, jsonify
 from core.gpio_singleton import gpio
 from hardware.motor_controller import TransportMotor
 from hardware.serial_reader import ArduinoSensorReader
-
 from hardware.encoder_state import EncoderState
 from hardware.homing2 import HomingController
+import subprocess
+import logging
+
+# imports bovenaan
+from hardware.stepper_motor import TB6600Stepper
+
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 
 app = Flask(__name__)
 
@@ -13,7 +20,7 @@ motor = TransportMotor()
 arduino_reader = ArduinoSensorReader(baudrate=115200)
 arduino_reader.start()
 
-encoder_state = EncoderState(mm_per_rev=50.0, direction_sign=-1)
+encoder_state = EncoderState(mm_per_rev=90.33, direction_sign=-1)
 
 homing = HomingController(
     motor=motor,
@@ -21,10 +28,16 @@ homing = HomingController(
     arduino_reader=arduino_reader,
     encoder_state=encoder_state,
     sensor_name="sensor_1",   # jouw inductiesensor
-    direction="backward",     # richting naar sensor
+    direction="forward",     # richting naar sensor
     speed=0.4,
     timeout_s=10.0
 )
+
+PUL = 5
+DIR = 6
+ENA = 13
+
+stepper = TB6600Stepper(pul_pin=PUL, dir_pin=DIR, ena_pin=ENA)
 
 @app.route('/')
 def home():
@@ -96,20 +109,6 @@ def manual_motor():
         # Handige debug als er iets misgaat
         print("Error in manual_motor:", e)
         return jsonify(success=False, error=str(e)), 500
-    
-
-# @app.route('/api/encoder', methods=['GET'])
-# def encoder_value():
-#     """
-#     Geeft AS5600 hoek in graden terug:
-#     { success: true, angle: 123.4 }
-#     """
-#     data = arduino_reader.get_latest()
-
-#     if not data.get("ok") or data.get("angle_deg") is None:
-#         return jsonify(success=False, error=data.get("error", "No data")), 500
-
-#     return jsonify(success=True, angle=float(data["angle_deg"]))
 
 @app.route('/api/encoder', methods=['GET'])
 def encoder_value():
@@ -157,3 +156,41 @@ def cancel_homing():
     if not ok:
         return jsonify(success=False, error="Homing not running"), 409
     return jsonify(success=True)
+
+@app.post("/api/restart")
+def api_restart():
+    # Start restart asynchroon zodat we nog een response kunnen sturen
+    subprocess.Popen(["sudo", "systemctl", "restart", "transport-hmi.service"])
+    return ("", 204)
+
+# -------------------------------------------------
+# NIEUW: Stepper API endpoints
+# -------------------------------------------------
+@app.route('/api/manual/stepper/move', methods=['POST'])
+def manual_stepper_move():
+    """
+    Verwacht JSON:
+      { "direction": "forward"|"backward", "steps": 2000, "delay": 0.001 }
+    """
+    data = request.get_json(force=True) or {}
+    direction = data.get("direction", "forward")
+    steps = int(data.get("steps", 1))
+    delay = float(data.get("delay", 0.001))
+
+    try:
+        stepper.move(direction=direction, steps=steps, delay_s=delay)
+        return jsonify(success=True, queued=True)
+
+    except Exception as e:
+        print("Error in manual_stepper_move:", e)
+        return jsonify(success=False, error=str(e)), 500
+
+
+@app.route('/api/manual/stepper/stop', methods=['POST'])
+def manual_stepper_stop():
+    try:
+        stepper.stop()
+        return jsonify(success=True)
+    except Exception as e:
+        print("Error in manual_stepper_stop:", e)
+        return jsonify(success=False, error=str(e)), 500

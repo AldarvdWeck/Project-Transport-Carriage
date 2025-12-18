@@ -4,12 +4,17 @@
 // Snelheid in stappen 0..10 (0 = 0.0, 10 = 1.0)
 let currentSpeedLevel = 6;  // default 6 → 0.6 PWM
 
-// iets met knoppen uitzetten
-let UI_LOCK = {
-  locked: false,
-  activeBtn: null,
-  disabled: new Map(), // btn -> previousDisabled
+// ==============================
+// Y-AS SPEED CONFIGURATIE
+// ==============================
+
+// Lagere delay = hogere snelheid
+const Y_SPEEDS = {
+    1: 0.0007,   // langzaam
+    2: 0.0002,   // middel
+    3: 0.00001    // snel
 };
+
 
 // Wacht tot de DOM geladen is
 document.addEventListener('DOMContentLoaded', function() {
@@ -35,6 +40,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialiseer homing
     initializeHomingButton();
+
+    initializeRestartButton();
+
+    // Initialiseer y-as stepper (TB6600)
+    initializeYSpeedControl();
+    initializeYStepperControls();
+
+    
 });
 
 
@@ -439,6 +452,7 @@ async function updateManualSensors(encoderEl, potEl) {
         }
     }
 }
+
 // =====================
 // Homing knop (minimal)
 // =====================
@@ -447,16 +461,12 @@ let homingRunning = false;
 let homingPollTimer = null;
 
 function setHomeBtnActive(btn, active) {
-  // active = donker
-  btn.classList.toggle('bg-gray-800', active);
-  btn.classList.toggle('text-white', active);
-  btn.classList.toggle('hover:bg-gray-900', active);
-
-  // inactive = wit
-  btn.classList.toggle('bg-white', !active);
-  btn.classList.toggle('text-black', !active);
-  btn.classList.toggle('hover:bg-gray-200', !active);
+  // Force override: dit wint altijd van classes/hover
+  btn.style.backgroundColor = active ? '#1f2937' : ''; // Tailwind gray-800
+  btn.style.color = active ? 'white' : '';
+  btn.style.borderColor = ''; // laat je border zoals die is
 }
+
 
 async function getHomingStatus() {
   const res = await fetch('/api/homing/status', { cache: 'no-store' });
@@ -547,3 +557,143 @@ function initializeHomingButton() {
     }
   });
 }
+
+// =====================
+// Restart programma knop
+// =====================
+
+function initializeRestartButton() {
+    const btn = document.getElementById("restartBtn");
+    if (!btn) return;
+
+    btn.addEventListener("click", async () => {
+        console.log("Restart button clicked");
+
+        btn.disabled = true;
+        btn.classList.add("opacity-50");
+
+        try {
+            const res = await fetch("/api/restart", { method: "POST" });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+            // Na restart komt de app weer online → pagina reloaden
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+
+        } catch (err) {
+            console.error("Restart failed:", err);
+            alert("Restart failed");
+            btn.disabled = false;
+            btn.classList.remove("opacity-50");
+        }
+    });
+}
+
+// =====================
+// Stepper motor
+// =====================
+
+let ySpeedLevel = 2; // start op speed 2 (midden)
+
+function initializeYSpeedControl() {
+    const btnDown = document.getElementById("btn-speed-down-y");
+    const btnUp   = document.getElementById("btn-speed-up-y");
+    const display = document.getElementById("speed-y-display");
+
+    if (!btnDown || !btnUp || !display) {
+        console.warn("Y-speed controls niet gevonden");
+        return;
+    }
+
+    function updateDisplay() {
+        display.textContent = ySpeedLevel.toString();
+    }
+
+    btnDown.addEventListener("click", () => {
+        if (ySpeedLevel > 1) {
+            ySpeedLevel--;
+            updateDisplay();
+        }
+    });
+
+    btnUp.addEventListener("click", () => {
+        if (ySpeedLevel < 3) {
+            ySpeedLevel++;
+            updateDisplay();
+        }
+    });
+
+    // init
+    updateDisplay();
+    console.log("Y-speed control actief, start op", ySpeedLevel);
+}
+
+function initializeYStepperControls() {
+  const btnFwd = document.getElementById("btn-y-forward");
+  const btnBwd = document.getElementById("btn-y-backward");
+
+  if (!btnFwd || !btnBwd) return;
+
+  // "Oneindige" move: groot getal, stop breekt ‘m af
+  const JOG_STEPS = 1000000000;
+
+  // Snelheid: kleiner = sneller (maar niet te klein)
+  const JOG_DELAY = 0.0005; // probeer 0.001, 0.0005, 0.002 etc.
+
+  async function startJog(direction) {
+    
+    const delay = Y_SPEEDS[ySpeedLevel];
+
+    try {
+      await fetch("/api/manual/stepper/move", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          direction: direction,   // "forward" / "backward"
+          steps: JOG_STEPS,
+          delay: delay
+        })
+      });
+    } catch (e) {
+      console.error("startJog error:", e);
+    }
+  }
+
+  async function stopJog() {
+    try {
+      await fetch("/api/manual/stepper/stop", { method: "POST" });
+    } catch (e) {
+      console.error("stopJog error:", e);
+    }
+  }
+
+  function bindHold(button, direction) {
+    // Desktop muis
+    button.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+      startJog(direction);
+    });
+    button.addEventListener("mouseup", stopJog);
+    button.addEventListener("mouseleave", stopJog);
+
+    // Touch (telefoon/tablet)
+    button.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      startJog(direction);
+    }, { passive: false });
+    button.addEventListener("touchend", stopJog);
+    button.addEventListener("touchcancel", stopJog);
+
+    // Voorkom “lang indrukken” context menu
+    button.addEventListener("contextmenu", (e) => e.preventDefault());
+  }
+
+  bindHold(btnFwd, "forward");
+  bindHold(btnBwd, "backward");
+
+  // Extra veiligheid: als je muis loslaat buiten de knop
+  document.addEventListener("mouseup", stopJog);
+}
+
+

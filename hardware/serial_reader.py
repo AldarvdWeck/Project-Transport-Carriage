@@ -71,6 +71,8 @@ class ArduinoSensorReader:
                         line = ser.readline().decode("utf-8", errors="ignore").strip()
                         if not line:
                             continue
+                        
+                        # print(f"[ArduinoReader] RX: '{line}'")
 
                         # verwacht "angle,pot"
                         try:

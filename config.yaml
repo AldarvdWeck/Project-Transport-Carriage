@@ -35,3 +35,13 @@ encoder:
     bus: 1        # I2C bus, meestal 1 op een Pi
     address: 0x36   # standaard I2C-adres van de AS5600
     zero_offset_deg: 0.0   # optioneel: 0°-kalibratie
+
+steppers:
+  y_axis:
+    chip: /dev/gpiochip0
+    step_pin: 5
+    dir_pin: 6
+    ena_pin: 13
+    signals_active_low: true
+    steps_per_mm: 400
+    min_pulse_us: 8

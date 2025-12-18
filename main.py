@@ -38,10 +38,12 @@ try:
         "--disable-infobars",
         "--noerrdialogs",
         "--incognito",
+        "--log-level=3",      # minder Chromium spam
         "http://localhost:5000"
-    ])
+    ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 except Exception as e:
     print("Kon Chromium niet starten:", e)
+
 
 print("HMI gestart in fullscreen. Druk Ctrl+C om te stoppen.")
 
